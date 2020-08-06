@@ -14,10 +14,10 @@ bookmarkRouter
     })
     .post((req, res) => { // req.body returning undefined 
         console.log(req.body)
-        const { title, url, rating, content } = req.body;
+        const { title, url, rating, description } = req.body;
         
 
-        if(!title || !url || !rating || !content){
+        if(!title || !url || !rating || !description){
             logger.error(`A title is required`);
             return res
                 .send(400)
@@ -31,7 +31,7 @@ bookmarkRouter
             title,
             url,
             rating,
-            content
+            description
         }
 
         list.push(bookmark);

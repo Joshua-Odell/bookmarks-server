@@ -3,7 +3,7 @@ const list = [{
     title: "Google",
     url:"www.google.com",
     rating: 4.5,
-    content: "a search engine"
+    description: "a search engine"
 }];
 
 module.exports = { list }
