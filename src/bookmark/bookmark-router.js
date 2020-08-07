@@ -52,7 +52,7 @@ bookmarkRouter
         
         const newList = list.find(li => li.id == id);
 
-        if(!list){
+        if(!newList){
             logger.error(`List with id ${id} not found.`);
             return res
                 .status(404)
