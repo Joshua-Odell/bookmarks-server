@@ -1,19 +1,28 @@
+require('dotenv').config()
 const express = require('express')
 const { v4: uuid} = require('uuid')
 const logger = require('../logger')
 const { list } = require('../store')
+const { NODE_ENV } = require('../config')
+const BookmarksService = require('../bookmarks-service')
+const app = express()
 
 const bookmarkRouter = express.Router()
 const bodyParser = express.json()
 
+
 bookmarkRouter
     .route('/bookmarks')
-    .get((req, res) => {
-        res
-            .json(list);
+    .get((req, res, next) => {
+        const knexInstance = req.app.get('db')
+        BookmarksService.getAllBookmarks(knexInstance)
+            .then(bookmarks => {
+                res.json(bookmarks)
+            })
+            .catch(next)
     })
-    .post((req, res) => { // req.body returning undefined 
-        console.log(req.body)
+    .post((req, res) => { 
+        const knexInstance = req.app.get('db')
         const { title, url, rating, description } = req.body;
         
 
@@ -47,21 +56,22 @@ bookmarkRouter
 
 bookmarkRouter
     .route('/bookmarks/:id')
-    .get((req, res) => { 
-        const { id } = req.params;
-        
-        const newList = list.find(li => li.id == id);
-
-        if(!newList){
-            logger.error(`List with id ${id} not found.`);
-            return res
-                .status(404)
-                .send('List not found')
-        }
-        res.json(newList);
+    .get((req, res, next) => { 
+        const knexInstance = req.app.get('db')
+        BookmarksService.getById(knexInstance, req.params.id)
+            .then(article => {
+                if(!article){
+                    return res.status(404).json({
+                        error: {message: `Bookmark Not Found`}
+                    })
+                }
+                res.json(article)
+            })
+            .catch(next)
     })
     .delete((req, res) => {
         const { id } = req.params;
+        const knexInstance = req.app.get('db')
         console.log(id)
 
         const bookmarkIndex = list.findIndex(bookmark => bookmark.id == id);
