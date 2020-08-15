@@ -24,10 +24,11 @@ bookmarkRouter
     .post((req, res) => { 
         const knexInstance = req.app.get('db')
         const { title, url, rating, description } = req.body;
+        const newBookmark = { title, url, rating, description }
         
 
         if(!title || !url || !rating || !description){
-            logger.error(`A title is required`);
+            logger.error(`Missing required fields`);
             return res
                 .send(400)
                 .send('Invalid data: title, url and rating required');
@@ -35,23 +36,18 @@ bookmarkRouter
 
         const id = uuid();
 
-        const bookmark = {
-            id,
-            title,
-            url,
-            rating,
-            description
-        }
+        BookmarksService.insertBookmark(
+            req.app.get('db'),
+            newBookmark
+        )
 
-        list.push(bookmark);
-
-        logger.info(`Card with id ${id} created`);
-
-        res 
+        .then(article => {
+            res 
             .status(201)
             .location(`http://localhost:8000/bookmark/${id}`)
             .json(bookmark);
-
+        })       
+        .catch(next)
     })
 
 bookmarkRouter
