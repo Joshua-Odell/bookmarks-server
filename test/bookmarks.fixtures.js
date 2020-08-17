@@ -10,3 +10,7 @@ function makeBookmarkArray(){
 
     ]
 }
+
+module.exports = {
+    makeBookmarkArray,
+}
